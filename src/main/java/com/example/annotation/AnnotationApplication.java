@@ -13,8 +13,8 @@ public class AnnotationApplication {
 //        Student student = new Student();
 //        ParsePerson.parse(Student.class);
 //        ParsePerson.parse(Student2.class);
-        ParsePerson.parse("com.example.annotation.bean");
         SpringApplication.run(AnnotationApplication.class, args);
+        ParsePerson.parse("com.example.annotation.bean");
     }
 
 }

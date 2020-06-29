@@ -1,7 +1,11 @@
 package com.example.annotation.parseannotation;
 
 import com.example.annotation.myannotation.Person;
+import org.springframework.context.EnvironmentAware;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -20,7 +24,18 @@ import java.util.jar.JarFile;
  * @Author zp
  * @create 2019/7/26 9:59
  */
-public class ParsePerson {
+@Component
+public class ParsePerson implements EnvironmentAware {
+
+    private Environment environment;
+
+    public static ParsePerson parsePerson;
+
+    @PostConstruct
+    void init(){
+        parsePerson = this;
+    }
+
     public static void parse(Class c) {
         Annotation[] declaredAnnotations = c.getDeclaredAnnotations();
         for(Annotation a : declaredAnnotations){
@@ -42,7 +57,11 @@ public class ParsePerson {
             for(Annotation a : declaredAnnotations){
                 if(a instanceof Person) {
                     Person p = (Person) a;
-                    System.out.println(c.getName() + " name: " + p.name() + ",age: " + p.age());
+                    String name = p.name();
+                    if(name.startsWith("$")){
+                        name = parsePerson.environment.resolvePlaceholders(name);
+                    }
+                    System.out.println(c.getName() + " name: " + name + ",age: " + p.age());
                     if(p.age() < 0){
                         System.out.println(c.getName() + "age can't be < 0 , now is " + p.age());
                     }
@@ -190,5 +209,10 @@ public class ParsePerson {
                 }
             }
         }
+    }
+
+    @Override
+    public void setEnvironment(Environment environment) {
+        this.environment = environment;
     }
 }
